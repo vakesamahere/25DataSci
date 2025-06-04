@@ -102,7 +102,7 @@ def fetch_year_box_office(year):
 
 def process_movie_data(data, year):
     """处理电影数据，返回格式化的列表"""
-    df = pd.DataFrame(columns=["Title", "Box Office", "Average Price", "Average Attendance"])
+    df = pd.DataFrame(columns=["Title", "Box Office", "Average Price", "Average Attendance", "year"])
     # data 目前是字符串，需要用正则
     pattren_item = r'<ul class="row" .*?<p class="first-line">(.*?)</p>.*?<li class="col2 tr">([\d\.]+)</li>.*?<li class="col3 tr">([\d\.]+)</li>.*?<li class="col4 tr">(\d+)</li>'
     data = data.replace("\n", " ")
@@ -120,7 +120,8 @@ def process_movie_data(data, year):
             "Title": title,
             "Box Office": box_office,
             "Average Price": average_price,
-            "Average Attendance": average_attendance
+            "Average Attendance": average_attendance,
+            "year": year,
         })
         df = pd.concat([df, temp_serie.to_frame().T], ignore_index=True)
     return df
@@ -140,7 +141,7 @@ def main():
     if not os.path.exists("data"):
         os.makedirs("data")
     
-    df = pd.DataFrame(columns=["Title", "Box Office", "Average Price", "Average Attendance"])
+    df = pd.DataFrame(columns=["Title", "Box Office", "Average Price", "Average Attendance", "year"])
     # 使用tqdm显示进度
     for year in tqdm(years, desc="爬取年份"):
         data = fetch_year_box_office(year)
@@ -148,7 +149,19 @@ def main():
             temp_df = process_movie_data(data, year)
             df = pd.concat([df, temp_df], ignore_index=True)
     
-    # 所有年份的数据合并保存
+    # 把Title相同的行合并，box office求和，average price和average attendance取加权平均值，year取最小值
+    # 确保是数值类型
+    df["Box Office"] = pd.to_numeric(df["Box Office"], errors='coerce')
+    df["Average Price"] = pd.to_numeric(df["Average Price"], errors='coerce')
+    df["Average Attendance"] = pd.to_numeric(df["Average Attendance"], errors='coerce')
+    df["year"] = pd.to_numeric(df["year"], errors='coerce')
+    aggregation_funcs = {
+        "Box Office": "sum",
+        "Average Price": lambda x: (x * df.loc[x.index, "Box Office"]).sum() / df.loc[x.index, "Box Office"].sum(),
+        "Average Attendance": lambda x: (x * df.loc[x.index, "Box Office"]).sum() / df.loc[x.index, "Box Office"].sum(),
+        "year": "min"
+    }
+    df = df.groupby("Title").agg(aggregation_funcs).reset_index()
     save_to_csv(df, "data/maoyan_box_office_all.csv")
     print("全部数据爬取完成!")
 
