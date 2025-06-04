@@ -18,10 +18,6 @@ comment_counts = comment_counts[comment_counts >= bound]
 
 print("Number of unique IDs:", len(comment_counts))
 
-# 查看details的tags列，它是形如['喜剧', '爱情']的字符串，需要统计每一种类型的电影个数
-# 首先，将tags列转换为列表
-# 然后，统计有多少个不同的类型（'戏剧'这样的单个字符串算一个类型）
-# 创建一个集合存储展开的类型
 tags_set = set()
 for tags in df['tags'].dropna():
     # 将字符串转换为列表
