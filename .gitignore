@@ -8,3 +8,7 @@ test/
 __pycache__/
 spiders.py
 logs/
+*.png
+temp/
+data/*
+data/

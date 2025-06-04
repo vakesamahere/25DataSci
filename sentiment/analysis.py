@@ -18,10 +18,10 @@ df['polarity'] = df['prob_positive'] - df['prob_negative']
 agg_funcs = {
     'polarity': ['mean', 'std'],
     'review_id': ['count'],
-    'sentiment': [lambda x: (x == 1).sum(), lambda x: (x == 0).sum()],
+    'sentiment': [lambda x: (x == 1).sum(), lambda x: (x == 0).sum(),'std'],
 }
 df = df.groupby('mv_id').agg(agg_funcs).reset_index()
-df.columns = ['mv_id', 'polarity_mean', 'polarity_std', 'comment_count', 'count_positive', 'count_negative']
+df.columns = ['mv_id', 'polarity_mean', 'polarity_std', 'comment_count', 'count_positive', 'count_negative', 'sentiment_std']
 df['positive_ratio'] = df['count_positive'] / df['comment_count']
 df['negative_ratio'] = df['count_negative'] / df['comment_count']
 # 计算正面和负面评论数

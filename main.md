@@ -10,3 +10,6 @@
 
 # connection
 - data_connection.py
+
+# analysis
+- data_analysis/main.py

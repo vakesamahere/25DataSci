@@ -1,3 +1,8 @@
+使用数据: data/data_main.csv
+数据各列的含义：data/data_main.md
+
+你要用python data_analysis/main.py这个命令运行，时刻保持在根目录
+
 4. 评论特征与票房关系建模
 4.1 回归分析：显著性验证
 4.1.1 主回归

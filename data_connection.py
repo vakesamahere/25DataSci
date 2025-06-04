@@ -29,7 +29,7 @@ cols = [
   "id", "title", "year",
   "rating_count", "rating_score",
   "tp_drama", "tp_comedy", "tp_action", "tp_romance",
-  "polarity_mean", "polarity_std", "comment_count", "positive_ratio", "negative_ratio",
+  "polarity_mean", "polarity_std", "comment_count", "positive_ratio", "negative_ratio", "sentiment_std",
   "box_off", "avg_price", "avg_attend",
 ]
 

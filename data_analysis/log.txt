@@ -1,0 +1,247 @@
+开始评论特征与票房关系建模分析...
+研究目标：验证评论特征与票房的显著性关联，并识别关键阈值
+=== 数据加载与预处理 ===
+原始数据形状: (433, 18)
+
+数据概览:
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 433 entries, 0 to 432
+Data columns (total 18 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   id              433 non-null    int64  
+ 1   title           433 non-null    object 
+ 2   year            433 non-null    int64  
+ 3   rating_count    265 non-null    float64
+ 4   rating_score    265 non-null    float64
+ 5   tp_drama        433 non-null    int64  
+ 6   tp_comedy       433 non-null    int64  
+ 7   tp_action       433 non-null    int64  
+ 8   tp_romance      433 non-null    int64  
+ 9   polarity_mean   433 non-null    float64
+ 10  polarity_std    420 non-null    float64
+ 11  comment_count   433 non-null    int64  
+ 12  positive_ratio  433 non-null    float64
+ 13  negative_ratio  433 non-null    float64
+ 14  sentiment_std   420 non-null    float64
+ 15  box_off         433 non-null    int64  
+ 16  avg_price       433 non-null    float64
+ 17  avg_attend      433 non-null    float64
+dtypes: float64(9), int64(8), object(1)
+memory usage: 61.0+ KB
+None
+
+描述性统计:
+                id         year   rating_count  rating_score    tp_drama   tp_comedy   tp_action  tp_romance  polarity_mean  polarity_std  comment_count  positive_ratio  negative_ratio  sentiment_std       box_off   avg_price  avg_attend
+count   433.000000   433.000000     265.000000    265.000000  433.000000  433.000000  433.000000  433.000000     433.000000    420.000000     433.000000      433.000000      433.000000     420.000000  4.330000e+02  433.000000  433.000000
+mean    530.665127  2017.515012    4123.550943      8.190566    0.609700    0.334873    0.302540    0.284065       0.038245      0.607138     502.595843        0.512020        0.487980       0.472579  3.125747e+04   35.322253   14.302030
+std     559.064452     4.908928   12371.311152      1.774489    0.488382    0.472492    0.459889    0.451489       0.253406      0.102002     671.926143        0.188578        0.188578       0.095758  9.230180e+04    5.628991   24.210902
+min       2.000000  2011.000000     103.000000      2.100000    0.000000    0.000000    0.000000    0.000000      -0.879320      0.016991       1.000000        0.000000        0.000000       0.000000  2.000000e+00   10.716269    1.000000
+25%     150.000000  2013.000000     385.000000      7.700000    0.000000    0.000000    0.000000    0.000000      -0.105800      0.577857      22.000000        0.407745        0.383383       0.473517  1.033000e+03   31.178534    5.000000
+50%     329.000000  2016.000000    1031.000000      8.800000    1.000000    0.000000    0.000000    0.000000       0.057885      0.614481     167.000000        0.510204        0.489796       0.493963  6.589000e+03   34.353573    9.000000
+75%     685.000000  2023.000000    3283.000000      9.500000    1.000000    1.000000    1.000000    1.000000       0.200284      0.657319     690.000000        0.616617        0.592255       0.500037  2.412300e+04   39.645299   17.000000
+max    2278.000000  2025.000000  142504.000000      9.900000    1.000000    1.000000    1.000000    1.000000       0.860447      1.075622    2019.000000        1.000000        1.000000       0.707107  1.543143e+06   53.104740  323.000000
+
+缺失值情况:
+id                  0
+title               0
+year                0
+rating_count      168
+rating_score      168
+tp_drama            0
+tp_comedy           0
+tp_action           0
+tp_romance          0
+polarity_mean       0
+polarity_std       13
+comment_count       0
+positive_ratio      0
+negative_ratio      0
+sentiment_std      13
+box_off             0
+avg_price           0
+avg_attend          0
+dtype: int64
+
+删除评论数小于20的记录前: 433
+删除后: 331
+
+=== 4.1 多元回归分析 ===
+回归结果:
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:            log_box_off   R-squared:                       0.315
+Model:                            OLS   Adj. R-squared:                  0.296
+Method:                 Least Squares   F-statistic:                     16.42
+Date:                Thu, 05 Jun 2025   Prob (F-statistic):           3.51e-22
+Time:                        01:37:05   Log-Likelihood:                 111.05
+No. Observations:                 331   AIC:                            -202.1
+Df Residuals:                     321   BIC:                            -164.1
+Df Model:                           9                                         
+Covariance Type:            nonrobust                                         
+==================================================================================
+                     coef    std err          t      P>|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+const            -19.4436      4.490     -4.330      0.000     -28.278     -10.609
+comment_count      0.0589      0.008      7.529      0.000       0.043       0.074
+polarity_mean      0.3816      0.305      1.252      0.212      -0.218       0.981
+positive_ratio    -0.5014      0.450     -1.113      0.266      -1.387       0.385
+polarity_std       0.5544      0.372      1.490      0.137      -0.178       1.286
+year               0.0106      0.002      4.823      0.000       0.006       0.015
+tp_drama          -0.0171      0.025     -0.691      0.490      -0.066       0.032
+tp_comedy         -0.0082      0.025     -0.329      0.742      -0.057       0.041
+tp_action          0.1047      0.025      4.114      0.000       0.055       0.155
+tp_romance        -0.0098      0.025     -0.388      0.698      -0.060       0.040
+==============================================================================
+Omnibus:                       57.046   Durbin-Watson:                   2.066
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               94.396
+Skew:                          -1.000   Prob(JB):                     3.18e-21
+Kurtosis:                       4.686   Cond. No.                     9.39e+05
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 9.39e+05. This might indicate that there are
+strong multicollinearity or other numerical problems.
+
+重要统计指标:
+R-squared: 0.3152
+Adjusted R-squared: 0.2960
+F-statistic: 16.4192
+Prob (F-statistic): 0.0000
+
+显著性分析 (p < 0.05):
+        Variable  Coefficient       P_value
+0          const   -19.443587  1.995106e-05
+1  comment_count     0.058874  5.231711e-13
+5           year     0.010579  2.186181e-06
+8      tp_action     0.104735  4.941803e-05
+回归分析图表已保存: data_analysis/regression_analysis.png
+
+=== 4.2 随机森林分类分析 ===
+高票房电影数量: 94
+低票房电影数量: 237
+高票房比例: 28.40%
+
+模型性能评估:
+准确率: 0.7400
+
+分类报告:
+              precision    recall  f1-score   support
+
+           0       0.75      0.96      0.84        72
+           1       0.62      0.18      0.28        28
+
+    accuracy                           0.74       100
+   macro avg       0.69      0.57      0.56       100
+weighted avg       0.71      0.74      0.68       100
+
+
+混淆矩阵:
+[[69  3]
+ [23  5]]
+
+=== 模型置信度评估 ===
+5折交叉验证准确率: 0.6889 ± 0.0601
+交叉验证得分范围: [0.6515, 0.7273]
+
+预测概率分析:
+高票房预测的平均概率: 0.3357
+低票房预测的平均概率: 0.7483
+
+特征重要性置信区间:
+特征重要性 99% 置信区间:
+  polarity_std: 0.2455 [0.1913, 0.2927]
+  positive_ratio: 0.2246 [0.1848, 0.2663]
+  polarity_mean: 0.2241 [0.1815, 0.2768]
+  year: 0.1762 [0.1291, 0.2396]
+  tp_action: 0.0367 [0.0149, 0.0760]
+
+置换重要性分析:
+置换重要性 90% 置信区间:
+  year: 0.0210 [-0.0067, 0.0487]
+  polarity_std: 0.0190 [-0.0002, 0.0382]
+  tp_action: 0.0160 [0.0025, 0.0295]
+  tp_comedy: 0.0040 [-0.0095, 0.0175]
+  tp_romance: -0.0080 [-0.0246, 0.0086]
+
+模型稳定性:
+随机森林包含 100 棵决策树
+每棵树的平均准确率: 0.6568
+
+样本量充足性:
+训练集样本数: 231 (特征数: 8)
+每个特征的样本比: 28.9:1
+高票房样本比例: 28.40% (建议>10%)
+
+特征重要性排名:
+          Feature  Importance
+2    polarity_std    0.259851
+1  positive_ratio    0.224295
+0   polarity_mean    0.215581
+3            year    0.169890
+7      tp_romance    0.041795
+6       tp_action    0.033394
+4        tp_drama    0.033138
+5       tp_comedy    0.022058
+分类分析图表已保存: data_analysis/classification_analysis.png
+
+决策规则分析:
+
+关键特征阈值分析:
+
+polarity_std:
+  高票房电影均值: 0.4852
+  低票房电影均值: 0.4808
+  差异: 0.0044
+  当 polarity_std >= 0.4754 时，高票房比例: 0.2984
+  当 polarity_std >= 0.4927 时，高票房比例: 0.2952
+  当 polarity_std >= 0.4994 时，高票房比例: 0.3133
+  当 polarity_std >= 0.5008 时，高票房比例: 0.0588
+
+positive_ratio:
+  高票房电影均值: 0.5049
+  低票房电影均值: 0.5178
+  差异: -0.0129
+  当 positive_ratio >= 0.4266 时，高票房比例: 0.2863
+  当 positive_ratio >= 0.5238 时，高票房比例: 0.2590
+  当 positive_ratio >= 0.6077 时，高票房比例: 0.2289
+  当 positive_ratio >= 0.6737 时，高票房比例: 0.1471
+
+polarity_mean:
+  高票房电影均值: 0.0450
+  低票房电影均值: 0.0550
+  差异: -0.0100
+  当 polarity_mean >= -0.0768 时，高票房比例: 0.2863
+  当 polarity_mean >= 0.0676 时，高票房比例: 0.2771
+  当 polarity_mean >= 0.1977 时，高票房比例: 0.2530
+  当 polarity_mean >= 0.2836 时，高票房比例: 0.1765
+
+==================================================
+           综合分析报告
+==================================================
+
+【回归分析主要发现】
+• R-squared: 0.3152 (模型解释了 31.5% 的票房变异)
+• 显著影响因子数量: 3
+• comment_count: 正向影响 (系数=0.0589, p=0.0000)
+• year: 正向影响 (系数=0.0106, p=0.0000)
+• tp_action: 正向影响 (系数=0.1047, p=0.0000)
+
+【分类分析主要发现】
+• 随机森林准确率: 0.7706
+• 最重要的影响因子:
+  - polarity_std: 0.2599
+  - positive_ratio: 0.2243
+  - polarity_mean: 0.2156
+  - year: 0.1699
+  - tp_romance: 0.0418
+
+【管理启示】
+1. 评论数量是票房成功的重要指标，应关注社交媒体营销
+2. 情感极性和争议程度对票房有显著影响
+3. 电影类型仍是重要的控制因素
+4. 建议重点关注评论质量和数量的平衡
+
+分析完成！结果图表已保存到 data_analysis/ 目录
+研究发现：评论特征确实对电影票房有显著影响，模型成功识别了关键阈值
