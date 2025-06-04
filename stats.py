@@ -10,7 +10,7 @@ df = pd.read_csv('data/short_coms_all.csv')
 # load data/details.csv to get titles
 df_details = pd.read_csv('data/details.csv', encoding='utf-8-sig')
 df = df.merge(df_details, on='id', how='inner')
-# df = df[df['title'].isin(pd.read_csv('box_office.csv')['title'])]
+# df = df[df['title'].isin(pd.read_csv('data/maoyan_box_office_all.csv')['Title'])]
 comment_counts = df['id'].value_counts()
 bound = 50
 # 截取评论大于等于10的id
