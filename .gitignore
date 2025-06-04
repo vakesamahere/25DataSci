@@ -1,0 +1,9 @@
+snapshot/
+*.html
+[^/]*.js
+[^/]*.csv
+[^/]*.txt
+test_*.py
+test/
+__pycache__/
+spiders.py
