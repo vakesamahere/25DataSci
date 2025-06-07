@@ -74,7 +74,7 @@ Dep. Variable:            log_box_off   R-squared:                       0.304
 Model:                            OLS   Adj. R-squared:                  0.283
 Method:                 Least Squares   F-statistic:                     14.75
 Date:                Sat, 07 Jun 2025   Prob (F-statistic):           7.64e-20
-Time:                        15:58:10   Log-Likelihood:                -597.99
+Time:                        16:02:27   Log-Likelihood:                -597.99
 No. Observations:                 314   AIC:                             1216.
 Df Residuals:                     304   BIC:                             1253.
 Df Model:                           9                                         
@@ -154,11 +154,11 @@ weighted avg       0.61      0.68      0.62        95
 
 特征重要性置信区间:
 特征重要性 99% 置信区间:
-  polarity_std: 0.2262 [0.1683, 0.2818]
-  polarity_mean: 0.2257 [0.1772, 0.3031]
-  positive_ratio: 0.2253 [0.1752, 0.2768]
-  year: 0.1882 [0.1306, 0.2687]
-  tp_action: 0.0399 [0.0189, 0.0944]
+  polarity_std: 0.2304 [0.1797, 0.2861]
+  positive_ratio: 0.2251 [0.1769, 0.2648]
+  polarity_mean: 0.2241 [0.1787, 0.2601]
+  year: 0.1847 [0.1340, 0.2598]
+  tp_action: 0.0406 [0.0165, 0.0893]
 
 置换重要性分析:
 置换重要性 90% 置信区间:
