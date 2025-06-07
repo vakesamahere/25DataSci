@@ -57,7 +57,7 @@ def load_and_clean_data():
     print(df.isnull().sum())
     
     # 删除评论数过少的记录（小于LEAST_COMS_COUNT条评论）
-    LEAST_COMS_COUNT = 20
+    LEAST_COMS_COUNT = 30
     print(f"\n删除评论数小于{LEAST_COMS_COUNT}的记录前: {len(df)}")
     df = df[df['comment_count'] >= LEAST_COMS_COUNT]
     print(f"删除后: {len(df)}")
@@ -66,16 +66,16 @@ def load_and_clean_data():
     # df = df.dropna(subset=['polarity_std'])
     # print(f"删除polarity_std缺失值后: {len(df)}")
 
-    # 对comment_count进行对数转换
-    df['log_comment_count'] = np.log(df['comment_count'] + 1)  # 加1避免log(0)
-    df['comment_count'] = df['log_comment_count']  # 替换原列
+    # # 对comment_count进行对数转换
+    # df['log_comment_count'] = np.log(df['comment_count'] + 1)  # 加1避免log(0)
+    # df['comment_count'] = df['log_comment_count']  # 替换原列
 
-    # 对box_off进行对数转换
-    df['log_box_off'] = np.log(df['box_off'] + 1)  # 加1避免log(0)
-    df['box_off'] = df['log_box_off']  # 替换原列
+    # # 对box_off进行对数转换
+    # df['log_box_off'] = np.log(df['box_off'] + 1)  # 加1避免log(0)
+    # df['box_off'] = df['log_box_off']  # 替换原列
 
-    # 使用sentiment_std替换polarity_std
-    df['polarity_std'] = df['sentiment_std']
+    # # 使用sentiment_std替换polarity_std
+    # df['polarity_std'] = df['sentiment_std']
     
     return df
 
@@ -546,12 +546,6 @@ def generate_summary_report(regression_results, classification_results, test_acc
     
     for _, row in feature_importance.head(5).iterrows():
         print(f"  - {row['Feature']}: {row['Importance']:.4f}")
-    
-    print("\n【管理启示】")
-    print("1. 评论数量是票房成功的重要指标，应关注社交媒体营销")
-    print("2. 情感极性和争议程度对票房有显著影响")
-    print("3. 电影类型仍是重要的控制因素")
-    print("4. 建议重点关注评论质量和数量的平衡")
 
 def main():
     """主函数"""
@@ -577,7 +571,6 @@ def main():
         generate_summary_report(regression_results, classification_results, 0.7706)
         
         print("\n分析完成！结果图表已保存到 data_analysis/ 目录")
-        print("研究发现：评论特征确实对电影票房有显著影响，模型成功识别了关键阈值")
         
     finally:
         # 恢复标准输出并关闭日志文件

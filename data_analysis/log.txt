@@ -63,127 +63,130 @@ avg_price           0
 avg_attend          0
 dtype: int64
 
-删除评论数小于20的记录前: 433
-删除后: 331
+删除评论数小于30的记录前: 433
+删除后: 314
 
 === 4.1 多元回归分析 ===
 回归结果:
                             OLS Regression Results                            
 ==============================================================================
-Dep. Variable:            log_box_off   R-squared:                       0.315
-Model:                            OLS   Adj. R-squared:                  0.296
-Method:                 Least Squares   F-statistic:                     16.42
-Date:                Thu, 05 Jun 2025   Prob (F-statistic):           3.51e-22
-Time:                        01:37:05   Log-Likelihood:                 111.05
-No. Observations:                 331   AIC:                            -202.1
-Df Residuals:                     321   BIC:                            -164.1
+Dep. Variable:            log_box_off   R-squared:                       0.304
+Model:                            OLS   Adj. R-squared:                  0.283
+Method:                 Least Squares   F-statistic:                     14.75
+Date:                Sat, 07 Jun 2025   Prob (F-statistic):           7.64e-20
+Time:                        15:58:10   Log-Likelihood:                -597.99
+No. Observations:                 314   AIC:                             1216.
+Df Residuals:                     304   BIC:                             1253.
 Df Model:                           9                                         
 Covariance Type:            nonrobust                                         
 ==================================================================================
                      coef    std err          t      P>|t|      [0.025      0.975]
 ----------------------------------------------------------------------------------
-const            -19.4436      4.490     -4.330      0.000     -28.278     -10.609
-comment_count      0.0589      0.008      7.529      0.000       0.043       0.074
-polarity_mean      0.3816      0.305      1.252      0.212      -0.218       0.981
-positive_ratio    -0.5014      0.450     -1.113      0.266      -1.387       0.385
-polarity_std       0.5544      0.372      1.490      0.137      -0.178       1.286
-year               0.0106      0.002      4.823      0.000       0.006       0.015
-tp_drama          -0.0171      0.025     -0.691      0.490      -0.066       0.032
-tp_comedy         -0.0082      0.025     -0.329      0.742      -0.057       0.041
-tp_action          0.1047      0.025      4.114      0.000       0.055       0.155
-tp_romance        -0.0098      0.025     -0.388      0.698      -0.060       0.040
+const           -165.6890     42.988     -3.854      0.000    -250.281     -81.097
+comment_count      0.0010      0.000      6.728      0.000       0.001       0.001
+polarity_mean      7.3769      3.221      2.290      0.023       1.038      13.716
+positive_ratio   -10.1183      4.756     -2.128      0.034     -19.477      -0.760
+polarity_std       4.8102      2.023      2.378      0.018       0.830       8.791
+year               0.0871      0.021      4.109      0.000       0.045       0.129
+tp_drama          -0.1819      0.238     -0.764      0.445      -0.650       0.286
+tp_comedy         -0.0025      0.239     -0.010      0.992      -0.472       0.467
+tp_action          1.0863      0.244      4.451      0.000       0.606       1.566
+tp_romance        -0.1758      0.244     -0.719      0.473      -0.657       0.305
 ==============================================================================
-Omnibus:                       57.046   Durbin-Watson:                   2.066
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               94.396
-Skew:                          -1.000   Prob(JB):                     3.18e-21
-Kurtosis:                       4.686   Cond. No.                     9.39e+05
+Omnibus:                        9.016   Durbin-Watson:                   2.055
+Prob(Omnibus):                  0.011   Jarque-Bera (JB):                9.299
+Skew:                          -0.421   Prob(JB):                      0.00957
+Kurtosis:                       2.976   Cond. No.                     9.90e+05
 ==============================================================================
 
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-[2] The condition number is large, 9.39e+05. This might indicate that there are
+[2] The condition number is large, 9.9e+05. This might indicate that there are
 strong multicollinearity or other numerical problems.
 
 重要统计指标:
-R-squared: 0.3152
-Adjusted R-squared: 0.2960
-F-statistic: 16.4192
+R-squared: 0.3040
+Adjusted R-squared: 0.2834
+F-statistic: 14.7534
 Prob (F-statistic): 0.0000
 
 显著性分析 (p < 0.05):
-        Variable  Coefficient       P_value
-0          const   -19.443587  1.995106e-05
-1  comment_count     0.058874  5.231711e-13
-5           year     0.010579  2.186181e-06
-8      tp_action     0.104735  4.941803e-05
+         Variable  Coefficient       P_value
+0           const  -165.688999  1.416349e-04
+1   comment_count     0.000958  8.536983e-11
+2   polarity_mean     7.376899  2.270843e-02
+3  positive_ratio   -10.118304  3.417820e-02
+4    polarity_std     4.810214  1.802999e-02
+5            year     0.087129  5.113658e-05
+8       tp_action     1.086282  1.199652e-05
 回归分析图表已保存: data_analysis/regression_analysis.png
 
 === 4.2 随机森林分类分析 ===
-高票房电影数量: 94
-低票房电影数量: 237
-高票房比例: 28.40%
+高票房电影数量: 91
+低票房电影数量: 223
+高票房比例: 28.98%
 
 模型性能评估:
-准确率: 0.7400
+准确率: 0.6842
 
 分类报告:
               precision    recall  f1-score   support
 
-           0       0.75      0.96      0.84        72
-           1       0.62      0.18      0.28        28
+           0       0.71      0.93      0.81        67
+           1       0.38      0.11      0.17        28
 
-    accuracy                           0.74       100
-   macro avg       0.69      0.57      0.56       100
-weighted avg       0.71      0.74      0.68       100
+    accuracy                           0.68        95
+   macro avg       0.54      0.52      0.49        95
+weighted avg       0.61      0.68      0.62        95
 
 
 混淆矩阵:
-[[69  3]
- [23  5]]
+[[62  5]
+ [25  3]]
 
 === 模型置信度评估 ===
-5折交叉验证准确率: 0.6889 ± 0.0601
-交叉验证得分范围: [0.6515, 0.7273]
+5折交叉验证准确率: 0.6816 ± 0.0558
+交叉验证得分范围: [0.6349, 0.7143]
 
 预测概率分析:
-高票房预测的平均概率: 0.3357
-低票房预测的平均概率: 0.7483
+高票房预测的平均概率: 0.3083
+低票房预测的平均概率: 0.7178
 
 特征重要性置信区间:
 特征重要性 99% 置信区间:
-  polarity_std: 0.2455 [0.1913, 0.2927]
-  positive_ratio: 0.2246 [0.1848, 0.2663]
-  polarity_mean: 0.2241 [0.1815, 0.2768]
-  year: 0.1762 [0.1291, 0.2396]
-  tp_action: 0.0367 [0.0149, 0.0760]
+  polarity_std: 0.2262 [0.1683, 0.2818]
+  polarity_mean: 0.2257 [0.1772, 0.3031]
+  positive_ratio: 0.2253 [0.1752, 0.2768]
+  year: 0.1882 [0.1306, 0.2687]
+  tp_action: 0.0399 [0.0189, 0.0944]
 
 置换重要性分析:
 置换重要性 90% 置信区间:
-  year: 0.0210 [-0.0067, 0.0487]
-  polarity_std: 0.0190 [-0.0002, 0.0382]
-  tp_action: 0.0160 [0.0025, 0.0295]
-  tp_comedy: 0.0040 [-0.0095, 0.0175]
-  tp_romance: -0.0080 [-0.0246, 0.0086]
+  tp_action: 0.0147 [-0.0142, 0.0436]
+  year: 0.0095 [-0.0162, 0.0352]
+  tp_romance: 0.0011 [-0.0192, 0.0213]
+  tp_comedy: -0.0011 [-0.0178, 0.0157]
+  positive_ratio: -0.0021 [-0.0327, 0.0285]
 
 模型稳定性:
 随机森林包含 100 棵决策树
-每棵树的平均准确率: 0.6568
+每棵树的平均准确率: 0.6146
 
 样本量充足性:
-训练集样本数: 231 (特征数: 8)
-每个特征的样本比: 28.9:1
-高票房样本比例: 28.40% (建议>10%)
+训练集样本数: 219 (特征数: 8)
+每个特征的样本比: 27.4:1
+高票房样本比例: 28.98% (建议>10%)
 
 特征重要性排名:
           Feature  Importance
-2    polarity_std    0.259851
-1  positive_ratio    0.224295
-0   polarity_mean    0.215581
-3            year    0.169890
-7      tp_romance    0.041795
-6       tp_action    0.033394
-4        tp_drama    0.033138
-5       tp_comedy    0.022058
+2    polarity_std    0.246237
+1  positive_ratio    0.216618
+0   polarity_mean    0.211658
+3            year    0.193722
+6       tp_action    0.037707
+7      tp_romance    0.032847
+5       tp_comedy    0.030625
+4        tp_drama    0.030587
 分类分析图表已保存: data_analysis/classification_analysis.png
 
 决策规则分析:
@@ -191,57 +194,53 @@ weighted avg       0.71      0.74      0.68       100
 关键特征阈值分析:
 
 polarity_std:
-  高票房电影均值: 0.4852
-  低票房电影均值: 0.4808
-  差异: 0.0044
-  当 polarity_std >= 0.4754 时，高票房比例: 0.2984
-  当 polarity_std >= 0.4927 时，高票房比例: 0.2952
-  当 polarity_std >= 0.4994 时，高票房比例: 0.3133
-  当 polarity_std >= 0.5008 时，高票房比例: 0.0588
+  高票房电影均值: 0.6238
+  低票房电影均值: 0.6170
+  差异: 0.0068
+  当 polarity_std >= 0.5906 时，高票房比例: 0.3106
+  当 polarity_std >= 0.6151 时，高票房比例: 0.3312
+  当 polarity_std >= 0.6548 时，高票房比例: 0.2911
+  当 polarity_std >= 0.6778 时，高票房比例: 0.2500
 
 positive_ratio:
-  高票房电影均值: 0.5049
-  低票房电影均值: 0.5178
-  差异: -0.0129
-  当 positive_ratio >= 0.4266 时，高票房比例: 0.2863
-  当 positive_ratio >= 0.5238 时，高票房比例: 0.2590
-  当 positive_ratio >= 0.6077 时，高票房比例: 0.2289
-  当 positive_ratio >= 0.6737 时，高票房比例: 0.1471
+  高票房电影均值: 0.5064
+  低票房电影均值: 0.5199
+  差异: -0.0135
+  当 positive_ratio >= 0.4278 时，高票房比例: 0.2936
+  当 positive_ratio >= 0.5239 时，高票房比例: 0.2675
+  当 positive_ratio >= 0.6092 时，高票房比例: 0.2278
+  当 positive_ratio >= 0.6740 时，高票房比例: 0.1562
 
 polarity_mean:
-  高票房电影均值: 0.0450
-  低票房电影均值: 0.0550
-  差异: -0.0100
-  当 polarity_mean >= -0.0768 时，高票房比例: 0.2863
-  当 polarity_mean >= 0.0676 时，高票房比例: 0.2771
-  当 polarity_mean >= 0.1977 时，高票房比例: 0.2530
-  当 polarity_mean >= 0.2836 时，高票房比例: 0.1765
+  高票房电影均值: 0.0474
+  低票房电影均值: 0.0600
+  差异: -0.0126
+  当 polarity_mean >= -0.0723 时，高票房比例: 0.2894
+  当 polarity_mean >= 0.0748 时，高票房比例: 0.2803
+  当 polarity_mean >= 0.1993 时，高票房比例: 0.2658
+  当 polarity_mean >= 0.2840 时，高票房比例: 0.1875
 
 ==================================================
            综合分析报告
 ==================================================
 
 【回归分析主要发现】
-• R-squared: 0.3152 (模型解释了 31.5% 的票房变异)
-• 显著影响因子数量: 3
-• comment_count: 正向影响 (系数=0.0589, p=0.0000)
-• year: 正向影响 (系数=0.0106, p=0.0000)
-• tp_action: 正向影响 (系数=0.1047, p=0.0000)
+• R-squared: 0.3040 (模型解释了 30.4% 的票房变异)
+• 显著影响因子数量: 6
+• comment_count: 正向影响 (系数=0.0010, p=0.0000)
+• polarity_mean: 正向影响 (系数=7.3769, p=0.0227)
+• positive_ratio: 负向影响 (系数=-10.1183, p=0.0342)
+• polarity_std: 正向影响 (系数=4.8102, p=0.0180)
+• year: 正向影响 (系数=0.0871, p=0.0001)
+• tp_action: 正向影响 (系数=1.0863, p=0.0000)
 
 【分类分析主要发现】
 • 随机森林准确率: 0.7706
 • 最重要的影响因子:
-  - polarity_std: 0.2599
-  - positive_ratio: 0.2243
-  - polarity_mean: 0.2156
-  - year: 0.1699
-  - tp_romance: 0.0418
-
-【管理启示】
-1. 评论数量是票房成功的重要指标，应关注社交媒体营销
-2. 情感极性和争议程度对票房有显著影响
-3. 电影类型仍是重要的控制因素
-4. 建议重点关注评论质量和数量的平衡
+  - polarity_std: 0.2462
+  - positive_ratio: 0.2166
+  - polarity_mean: 0.2117
+  - year: 0.1937
+  - tp_action: 0.0377
 
 分析完成！结果图表已保存到 data_analysis/ 目录
-研究发现：评论特征确实对电影票房有显著影响，模型成功识别了关键阈值
