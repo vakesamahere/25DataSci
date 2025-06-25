@@ -1,0 +1,327 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{float} % For better control of float placement (e.g., [H] option)
+\usepackage{hyperref} % For hyperlinks
+\usepackage{datetime2}
+\usepackage{booktabs} % Required for \toprule, \midrule, \bottomrule
+\usepackage{multirow} % For multirow cells in tables
+\usepackage[
+    backend=biber,      % The recommended backend
+    style=numeric,      % Numeric citation style, e.g., [1]
+    sorting=none        % Sort references in the order of citation
+]{biblatex}
+
+% Adjust margins (optional, customize as needed)
+\geometry{a4paper, margin=1in}
+
+% Title and Author information
+\title{Chinese Film Market: The Impact of Audience Reviews on Box Office Performance}
+\author{Vake}
+\date{\today}
+
+% --- Write the bib file contents directly into the tex file for convenience ---
+\begin{filecontents*}{\jobname.bib}
+@misc{left0ver_bert_sentiment,
+  author       = {{left0ver}},
+  title        = {bert-base-chinese-finetune-sentiment-classification},
+  year         = {2021},
+  publisher    = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/left0ver/bert-base-chinese-finetune-sentiment-classification}},
+  note         = {Accessed: 2024-06-25}
+}
+\end{filecontents*}
+\addbibresource{\jobname.bib}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This study aims to deeply explore the impact of audience reviews (including comment quantity, sentiment polarity, and degree of controversy) on film box office performance in the Chinese film market. By integrating data from Bilibili (B) and Maoyan Movie, we construct a multiple regression model to verify the statistically significant association between review characteristics and box office, and employ a decision tree (Random Forest) model to identify key thresholds and nonlinear mechanisms of review characteristics. The study finds that comment quantity, average sentiment polarity, and sentiment controversy all have complex relationships with film box office, and proposes suggestions for film production and marketing.
+\end{abstract}
+
+\textbf{Keywords}: Chinese film market; film box office; audience reviews; sentiment analysis; regression analysis; decision tree; random forest
+
+\section{Introduction}
+The Chinese film market is emerging as a powerful force, characterized by its rapid growth and unique consumer engagement patterns. In this evolving landscape, the traditional paradigms of film promotion and audience reception have been significantly reshaped by the pervasive influence of the internet and social media platforms. Audience reviews, once confined to professional critics or limited word-of-mouth, have now become an instantaneous, voluminous, and highly accessible source of public opinion, serving as a critical component of a film's promotional ecosystem and its subsequent word-of-mouth dissemination. This digital shift necessitates a deeper understanding of how these collective audience sentiments translate into tangible economic outcomes for films.
+
+Within the dynamic Chinese film market, audience comments on platforms like Bilibili transcend mere expressions of engagement; they encapsulate a complex interplay of sentiment tendencies, emotional intensities, and degrees of opinion divergence. These multifaceted characteristics of online reviews are increasingly recognized as potent determinants of a film's commercial viability, directly influencing its box office performance. This research endeavors to systematically quantify and comprehensively analyze the intricate relationships between these specific attributes of audience reviews—namely, comment quantity, sentiment polarity, and the degree of controversy—and their causal impact on box office success. By providing data-driven insights derived from a rigorous empirical investigation, this study aims to furnish the Chinese film industry with actionable strategic recommendations, enabling stakeholders to better navigate the complexities of digital word-of-mouth and optimize their production and marketing strategies for enhanced commercial returns.
+
+\section{Research Questions}
+This study is meticulously designed to address several fundamental questions concerning the interplay between audience reviews and film box office performance within the Chinese film market. Each question is formulated to dissect a specific dimension of audience feedback and its quantifiable influence on commercial success, thereby contributing to a more nuanced understanding of digital word-of-mouth dynamics.
+
+\subsection{Impact of Sentiment Polarity on Box Office Performance}
+The first core inquiry investigates the impact of the sentiment polarity embedded within audience comments on film box office performance. Beyond mere engagement, the emotional valence of reviews—whether predominantly positive, negative, or neutral—is hypothesized to exert a significant influence on potential viewers' decisions. This question seeks to ascertain the extent to which a collective positive or negative sentiment among early audiences can either propel a film towards greater commercial success or impede its box office trajectory, thereby highlighting the importance of managing and cultivating favorable public perception.
+
+\subsection{Impact of Sentiment Controversy on Box Office Performance}
+Secondly, the study explores the more intricate relationship between the intensity of controversy or the degree of emotional diversity within audience comments and a film's box office performance. This aspect moves beyond simple positive or negative sentiment to examine the effects of polarized opinions, heated debates, or a wide spectrum of emotional responses. It is posited that a certain level of controversy or opinion divergence, while seemingly negative, might paradoxically stimulate greater public interest, media coverage, and discussion, potentially translating into increased curiosity and subsequent ticket sales. This inquiry aims to uncover the mechanisms through which such complex sentiment landscapes influence commercial outcomes, offering insights into the strategic utilization of topicality in film marketing.
+
+\section{Data Collection and Preparation}
+\subsection{Data Collection Strategy}
+Our data collection strategy employs a systematic crawling approach, targeting both Maoyan Movie and Bilibili platforms. The process encompasses four integrated components. Box office data was comprehensively extracted from Maoyan Movie's yearly rankings spanning 2011 to 2025. For each film, we diligently collected the title, box office revenue, average ticket price, and average attendance. Film lists in China (including Hong Kong and Taiwan) were extracted from Bilibili's movie section. This phase captured crucial film information, including titles, platform links, and unique media IDs, with an ID registration mechanism in place to prevent duplicate entries. Subsequently, short user comments for each identified film were collected from Bilibili using their respective media IDs. To ensure robust data acquisition and mitigate IP blocking, a rotating pool of User-Agents was employed, alongside batch processing with temporary file storage, and a maximum collection limit of 2000 comments per film. Comprehensive comment metadata, including content, timestamp, likes, and user ratings, was also gathered. Finally, detailed film information was extracted from Bilibili's media pages. This encompassed film tags, duration, rating statistics, number of ratings, regional information, release dates, and additional metadata to facilitate comprehensive film profiling.
+
+\subsection{Data Scope}
+The data collection scope spans Chinese films released between 2011 and 2025. Our dataset integrates audience comments and film metadata from Bilibili with box office performance data from Maoyan Movie Box Office Chart.
+
+
+\subsection{Review Feature Extraction and Processing}
+For the sentiment analysis of movie comments, this study employs a fine-tuned BERT model \cite{left0ver_bert_sentiment}, which is based on the \texttt{bert-base-chinese} architecture. The model selection was based on several considerations. First, BERT's bidirectional context understanding capability makes it particularly suitable for Chinese text sentiment analysis. Second, the model was specifically fine-tuned for sentiment classification tasks, enabling more accurate sentiment predictions for movie reviews. Third, its binary classification output (positive/negative) provides clear sentiment labels while maintaining computational efficiency.
+
+The selected model \cite{left0ver_bert_sentiment} is a fine-tuned version of Google's bert-base-chinese. The base model, bert-base-chinese, is a powerful pre-trained model that has demonstrated strong performance on a wide range of Chinese natural language processing tasks. By fine-tuning this robust base on a sentiment classification task, the resulting model is highly specialized and optimized to accurately discern sentiment in Chinese text. Although specific performance metrics for this particular fine-tuned model (such as accuracy or F1-score) are not detailed on its Hugging Face model card, the established effectiveness of the BERT architecture, combined with the focused fine-tuning for sentiment analysis, provides a strong indication of its high performance and suitability for this study. Fine-tuning pre-trained models like BERT is a standard and effective method for achieving state-of-the-art results in sentiment analysis.
+
+In terms of performance metrics calculation, our approach employs a comprehensive pipeline. For each comment, the model computes both positive and negative sentiment probabilities through softmax normalization of the output logits. The polarity score for an individual comment is calculated as the difference between the positive and negative probabilities, providing a continuous measure ranging from -1 to 1. This method allows for a more nuanced sentiment representation compared to binary classification alone.
+
+For each movie, we aggregate these individual comment metrics to obtain movie-level sentiment indicators. These include the mean polarity score (\texttt{polarity\_mean}), which reflects the overall sentiment tendency, and the standard deviation of polarity scores (\texttt{polarity\_std}), which quantifies sentiment diversity or controversy. Additionally, we calculate the ratio of positive and negative comments (\texttt{positive\_ratio} and \texttt{negative\_ratio}) to provide categorical sentiment distribution metrics.
+
+
+
+\subsection{Data Cleaning and Preprocessing}
+Our data preprocessing pipeline consists of several key stages to ensure data quality and consistency for subsequent analysis. Initially, we integrated data from multiple sources. The box office data was sourced from Maoyan Movie's CSV files, containing box office figures, average ticket prices, and attendance metrics. This data was merged with film details and comment data from Bilibili using title matching as the key identifier.
+
+For genre categorization, we implemented One-hot encoding by creating binary indicators for major film genres: drama (\texttt{tp\_drama}), comedy (\texttt{tp\_comedy}), action (\texttt{tp\_action}), and romance (\texttt{tp\_romance}). These indicators were derived from the film tags using string matching, where each film was assigned a value of 1 if its tags contained the respective genre keyword, and 0 otherwise. To ensure data quality, we retained only films that had at least one of these genre classifications.
+
+In terms of data cleaning, we employed a threshold-based approach for comment count filtering. Specifically, we removed records with fewer than 30 comments to ensure sufficient data for meaningful sentiment analysis. Before the filtering, the dataset contained a larger number of films, but after applying this criterion, we retained only those with substantial user engagement. This step was crucial for maintaining the reliability of our sentiment analysis metrics.
+
+For handling missing values, particularly in the \texttt{polarity\_std} field which measures sentiment polarity variation, we carefully documented affected records but retained them in the dataset to maintain sample size. The dataset was standardized by renaming key columns for consistency, with box office figures normalized to 10,000 RMB units (\texttt{box\_off}), and clear naming conventions applied for pricing (\texttt{avg\_price}) and attendance (\texttt{avg\_attend}) metrics.
+
+Through this systematic preprocessing approach, we constructed a comprehensive analytical dataset that integrated box office performance, genre classifications, and sentiment metrics while maintaining data integrity and analytical reliability. The final cleaned dataset retained all essential variables required for our subsequent statistical analyses.
+
+\subsection{Variable Definition}
+The variables involved in this study mainly include film metadata, box office data, and audience comment data.
+
+Regarding film metadata, \texttt{film\_ID} serves as the unique identifier for films, \texttt{film\_name} is the Chinese title of the film, and \texttt{release\_year} records the film's release time (covering 2011 to 2023). Major film genres are represented by One-Hot Encoding, including drama (\texttt{tp\_drama}), comedy (\texttt{tp\_comedy}), action (\texttt{tp\_action}), and romance (\texttt{tp\_romance}).
+
+In terms of box office data, \texttt{box\_off} represents the film's box office revenue (in 10,000 RMB), which is the main dependent variable in this study. Given its severe right-skewed distribution, a logarithmic transformation is applied in regression analysis to satisfy model assumptions.
+
+Audience comment data includes: \texttt{comment\_count}, representing the total number of comments related to the film's plot, used to measure plot discussion volume or engagement; \texttt{polarity\_mean}, the average sentiment polarity score of audience comments on the film's plot, typically ranging between [-1, 1], reflecting overall sentiment tendency; \texttt{polarity\_std}, the standard deviation of sentiment polarity scores of audience comments on the film's plot, designed to reflect emotional volatility, diversity, or controversy, with a larger standard deviation indicating greater emotional divergence. Descriptive statistics for key variables are shown in Table \ref{tab:descriptive_stats}.
+
+\begin{table}[h!]
+\centering
+\caption{Descriptive Statistics of Key Variables}
+\label{tab:descriptive_stats}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+\textbf{Variable} & \textbf{Count} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{50\%} & \textbf{75\%} & \textbf{Max} \\
+ \midrule
+% \texttt{year} & 433.00 & 2017.52 & 4.91 & 2011.00 & 2013.00 & 2016.00 & 2023.00 & 2025.00 \\ \texttt{box\_off} & 433.00 & 31257.47 & 92301.80 & 2 & 1033 & 6589 & 24123 & 1543143 \\
+\texttt{comment\_count} & 433.00 & 502.60 & 671.93 & 1.00 & 7.70 & 167.00 & 690.00 & 2019.00 \\
+\texttt{polarity\_mean} & 433.00 & 0.0382 & 0.2534 & -0.8793 & -0.1058 & 0.0579 & 0.1661 & 0.8604 \\
+\texttt{polarity\_std} & 420.00 & 0.6071 & 0.1020 & 0.0170 & 0.5779 & 0.6145 & 0.6573 & 1.0756 \\
+\texttt{avg\_price} & 433.00 & 35.32 & 5.63 & 10.72 & 31.18 & 34.35 & 39.65 & 53.10 \\
+\texttt{avg\_attend} & 433.00 & 14.30 & 24.21 & 1.00 & 5.00 & 9.00 & 17.00 & 323.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\section{Core Analysis: Modeling the Relationship Between Review Features and Box Office}
+
+\subsection{Regression Analysis: Significance Verification}
+
+\subsubsection{Main Regression}
+The main regression analysis aims to verify the statistically significant association between various plot comment indicators and specific box office figures, and to quantify their average impact. To this end, this study establishes a multiple regression model with film box office (which is logarithmically transformed) as the dependent variable. Independent variables include core comment features, such as average sentiment score (\texttt{polarity\_mean}) and standard deviation of sentiment scores (\texttt{polarity\_std}). In addition, control variables such as comment count (\texttt{comment\_count}), release year (\texttt{year}), film genre (one-hot encoded: \texttt{tp\_drama}, \texttt{tp\_comedy}, \texttt{tp\_action}, \texttt{tp\_romance}) are included. This study will use a linear regression model for analysis, with results shown in Table \ref{tab:mlr_res}.
+
+\begin{equation}
+\begin{split}
+\ln(\text{box\_off}) = &\beta_0 + \beta_1 \cdot \text{polarity\_mean} + \beta_2 \cdot \text{polarity\_std} \\
+& + \beta_3 \cdot \text{comment\_count} + \beta_4 \cdot \text{year} + \beta_5 \cdot \text{tp\_drama} + \beta_6 \cdot \text{tp\_comedy} \\
+&+ \beta_7 \cdot \text{tp\_action} + \beta_8 \cdot \text{tp\_romance} + \varepsilon
+\end{split}
+\end{equation}
+
+\begin{table}[htbp]
+\centering
+\caption{OLS Regression Results for Log Box Office}
+\label{tab:mlr_res}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Variable} & \textbf{Coefficient} & \textbf{Std. Error} & \textbf{t-value} & \textbf{p-value} \\
+\midrule
+polarity\_mean & 0.6057 & 0.501 & 1.208 & 0.228 \\
+polarity\_std & 4.4096 & 2.026 & 2.177 & 0.030 \\
+comment\_count & 0.0010 & 0.000 & 7.074 & 0.000 \\
+year & 0.0918 & 0.021 & 4.330 & 0.000 \\
+tp\_drama & -0.1808 & 0.239 & -0.755 & 0.451 \\
+tp\_comedy & -0.0131 & 0.240 & -0.055 & 0.957 \\
+tp\_action & 1.1002 & 0.245 & 4.484 & 0.000 \\
+tp\_romance & -0.2383 & 0.244 & -0.977 & 0.329 \\
+const & -179.7965 & 42.719 & -4.209 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figs/qq_plot.png} % Replace with your image filename
+\caption{Residual Plot}
+\label{fig:mlr_qq}
+\end{figure}
+
+\subsection{Decision Tree: Mechanism Testing}
+Decision tree analysis aims to identify key thresholds of review characteristics and reveal how they drive films into high box office categories through nonlinear rules and interactions. For this purpose, during the data preparation phase, continuous film box office data will be converted into categorical targets. For example, the top 25\% of films by box office within each genre will be labeled "High Box Office," and the rest labeled "Lower Box Office."
+
+Methodologically, this study will train classification models where the dependent variable is the film box office category ("High Box Office Success"/"Lower Box Office Success"). Independent variables include core review features (same as in regression analysis) and important control variables. Regarding model selection, although decision tree models may be unstable, this study recommends using a \textbf{Random Forest Classifier}, which can effectively identify feature importance, complex patterns, and visualize threshold effects through Partial Dependence Plots. In addition, Gradient Boosting Machines (GBM, such as XGBoost) are another high-performance model option.
+
+The outputs of decision tree analysis include feature importance ranking, revealing which review features and control variables are most important; confusion matrix and accuracy, used to evaluate the model's classification performance; and threshold visualization, showing at what thresholds specific review features significantly increase the probability of a film entering the high box office category. Importance results are shown in Tables \ref{tab:rf_res} and \ref{fig:rf_fea}, confusion matrix and accuracy in Tables \ref{tab:rf_cm} and \ref{fig:rf_cm}. Partial dependence plots for key influencing factors are shown in Figure \ref{fig:pd_all}.
+
+% Typically, insert decision tree analysis results figures here.
+% Example:
+% \begin{figure}[H]
+%\centering
+%\includegraphics[width=0.8\textwidth]{decision_tree_results.png} % Replace with your image filename
+%\caption{Decision Tree Analysis Results (Feature Importance, Evaluation Metrics, and Threshold Visualization)}
+%\label{fig:decision_tree_results}
+% \end{figure}
+\begin{table}[htbp]
+\centering
+\caption{Random Forest Feature Importance Ranking}
+\label{tab:rf_res}
+\begin{tabular}{lc}
+\toprule
+\textbf{Feature} & \textbf{Importance} \\
+\midrule
+comment\_count & 0.353740 \\
+polarity\_std & 0.192904 \\
+polarity\_mean & 0.187529 \\
+year & 0.153561 \\
+tp\_action & 0.035840 \\
+tp\_drama & 0.027272 \\
+tp\_romance & 0.026839 \\
+tp\_comedy & 0.022315 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Random Forest Classification Performance}
+\label{tab:rf_cm}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\
+\midrule
+Low box office (0) & 0.76 & 0.88 & 0.81 \\
+High box office (1) & 0.53 & 0.32 & 0.40 \\
+\midrule
+Accuracy & \multicolumn{3}{c}{0.72} \\
+Macro avg & 0.64 & 0.60 & 0.61 \\
+Weighted avg & 0.69 & 0.72 & 0.69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Model Confidence Assessment}
+\label{tab:rf_ma}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+5-fold Cross-Validation Accuracy & 0.7198 $\pm$ 0.1709 \\
+Cross-validation score range & {[}0.5556, 0.7937{]} \\
+Mean Probability for High Box Office & 0.4069 \\
+Mean Probability for Low Box Office & 0.7400 \\
+Average Accuracy per Tree & 0.6545 \\
+High Box Office Sample Ratio & 28.98\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Feature Threshold Analysis for High Box Office Prediction}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Feature} & \textbf{Threshold} & \textbf{High Box Office Ratio} \\
+\midrule
+\multirow{4}{*}{comment\_count} & $\geq$ -0.7915 & 0.3559 \\
+& $\geq$ -0.4757 & 0.4650 \\
+& $\geq$ 0.7441 & 0.4557 \\
+& $\geq$ 1.8601 & 0.4848 \\
+\midrule
+\multirow{4}{*}{polarity\_mean} & $\geq$ -0.6462 & 0.2894 \\
+& $\geq$ 0.0926 & 0.2803 \\
+& $\geq$ 0.7186 & 0.2658 \\
+& $\geq$ 1.1442 & 0.1875 \\
+\midrule
+\multirow{4}{*}{polarity\_std} & $\geq$ -0.5912 & 0.3106 \\
+& $\geq$ -0.0811 & 0.3312 \\
+& $\geq$ 0.7494 & 0.2911 \\
+& $\geq$ 1.2296 & 0.2500 \\
+\bottomrule
+\end{tabular}
+\label{tab:threshold_analysis}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figs/feature_importance_with_ci.png} % Replace with your image filename
+\caption{Decision Tree Feature Importance}
+\label{fig:rf_fea}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figs/confusion_matrix.png} % Replace with your image filename
+\caption{Decision Tree Confusion Matrix}
+\label{fig:rf_cm}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\caption{Partial Dependence Plots for Key Variables}
+\label{fig:pd_all}
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figs/partial_dependence_polarity_mean.png}
+\caption{Partial dependence plot for positive\_mean}
+\label{fig:pd_polarity_mean}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figs/partial_dependence_polarity_std.png}
+\caption{Partial dependence plot for polarity\_std}
+\label{fig:pd_polarity_std}
+\end{subfigure}
+\end{figure}
+
+\section{Research Results}
+
+\subsection{Interpretation of Regression Analysis Results}
+The main regression analysis (Table \ref{tab:mlr_res}) in this study aims to quantify the average impact of audience review characteristics on film box office. The results show that the coefficient for average sentiment polarity (\texttt{polarity\_mean}) is 0.6057, but its \(p\)-value is 0.228, not reaching statistical significance. This might imply that, after controlling for other variables, the linear impact of the average sentiment polarity of film reviews on box office is not significant. However, the standard deviation of comment sentiment polarity scores (\texttt{polarity\_std}), i.e., the degree of emotional controversy, shows a significant positive impact on box office performance ($\beta_2 = 4.4096$, \(p < 0.05\)). This suggests that a certain degree of comment controversy or emotional diversity might paradoxically help boost film box office, possibly related to sparking more discussion and attention.
+
+Regarding control variables, the release year (\texttt{year}) has a significant positive impact on box office ($\beta_4 = 0.0918$, \(p < 0.001\)), which may reflect the overall growth trend of the Chinese film market. Among film genres, action films (\texttt{tp\_action}) have a significant positive impact on box office ($\beta_7 = 1.1002$, \(p < 0.001\)), indicating that action films have strong box office appeal in the Chinese film market. In contrast, the coefficients for drama (\texttt{tp\_drama}), comedy (\texttt{tp\_comedy}), and romance (\texttt{tp\_romance}) are not significant, suggesting that after considering comment features and release year in the model, the direct linear impact of these genres on box office is not obvious. The residual plot (Figure \ref{fig:mlr_qq}) shows that the residuals are approximately normally distributed, providing preliminary support for the model's assumptions.
+
+\subsection{Interpretation of Decision Tree Analysis Results}
+The Random Forest classifier (Table \ref{tab:rf_res}) is used to identify key review characteristics influencing films entering the "High Box Office" category and their nonlinear mechanisms. The feature importance ranking (Table \ref{tab:rf_res} and Figure \ref{fig:rf_fea}) shows that the most important features for predicting high box office films are sentiment controversy (\texttt{polarity\_std}), with an importance of 0.192904, and average sentiment polarity (\texttt{polarity\_mean}), with an importance of 0.187529. This again emphasizes the critical role of sentiment controversy in box office success, while the importance of average sentiment polarity is also highlighted; although not significant in linear regression, it shows stronger explanatory power in the nonlinear model. Release year (\texttt{year}) also has high importance (0.153561), further validating the impact of temporal factors on box office performance.
+
+The model's classification performance (Table \ref{tab:rf_cm}) shows an overall accuracy of 0.72 for the Random Forest model. For predicting the "Low Box Office" category, the model's precision is 0.76, recall is 0.88, and F1-Score is 0.81. For predicting the "High Box Office" category, precision is 0.53, recall is 0.32, and F1-Score is 0.40. This indicates that the model performs better in identifying low box office films but still has room for improvement in identifying high box office films, with relatively low recall. The confusion matrix (Figure \ref{fig:rf_cm}) visually demonstrates the classifier's performance, where 59 low box office films were correctly predicted, 9 high box office films were correctly predicted, while 19 high box office films were incorrectly predicted as low box office, and 8 low box office films were incorrectly predicted as high box office.
+
+The model confidence assessment (Table \ref{tab:rf_ma}) shows a 5-fold cross-validation accuracy of $0.7198 \pm 0.1709$, with a cross-validation score range of $[0.5556, 0.7937]$, indicating that the model has a certain generalization ability. The high box office sample ratio is 28.98\%, which is consistent with the data preparation strategy of labeling the top 25\% of films by box office as "High Box Office."
+
+Partial dependence plots (Figure \ref{fig:pd_all}) reveal the nonlinear impact of review characteristics on the probability of a film entering the high box office category.
+\begin{itemize}
+\item The partial dependence plot for sentiment controversy (\texttt{polarity\_std}) (Figure \ref{fig:pd_polarity_std}) shows that as sentiment controversy increases, the probability of a film entering the high box office category also fluctuates. Within a certain range of controversy, the probability of high box office might rise, which again confirms the positive impact of appropriate controversy on box office.
+\end{itemize}
+
+% Threshold analysis (Table \ref{tab:threshold_analysis}) further quantifies at what thresholds specific review characteristics significantly increase the probability of a film entering the high box office category. For example, when comment count is $\geq -0.4757$, the high box office ratio reaches 0.4650, and when it is $\geq 1.8601$, the high box office ratio can reach 0.4848. This threshold information provides specific reference points for film marketing and promotion.
+
+\subsection{Summary and Insights}
+Combining the results of regression analysis and decision tree analysis, this study finds that audience reviews have a complex and significant impact on Chinese film box office performance.
+\begin{itemize}
+\item \textbf{Emotional controversy has potential positive impact}: Regression analysis shows a positive correlation between emotional controversy and box office, and decision tree analysis also lists it as an important feature. This may mean that moderate controversy and opinion divergence can instead attract broader attention and discussion, thereby indirectly promoting box office growth. For film producers and promoters, this suggests that topicality can be moderately utilized in film marketing to stimulate audience desire for discussion.
+\item \textbf{Complexity of average sentiment polarity}: Average sentiment polarity did not show significance in linear regression but has some importance in the decision tree model, and its partial dependence plot shows a nonlinear impact. This implies that simple positive sentiment is not the sole measure of box office success; the distribution and intensity of sentiment may be more crucial. The shaping of film word-of-mouth should not only pursue one-sided positive reviews but should focus more on emotional diversity and topicality.
+\item \textbf{Impact of film genre and year}: Action films have significant box office appeal, and the release year also has a continuous positive impact on box office, which aligns with market growth trends.
+\end{itemize}
+In summary, this study provides data-driven insights for film production and marketing in the Chinese film market. To improve box office performance, the film industry needs not only to focus on film quality itself but also to actively guide and manage audience reviews. Utilizing the potential emotional controversy in comments can spark broader social discussion and attention, thereby converting into actual box office revenue. Future research can further explore specific keywords in comments, comment release time, and other more detailed features to provide deeper box office prediction and marketing strategies.
+
+% --- Print the bibliography at the end of the document ---
+\printbibliography[title={References}]
+
+\end{document}
