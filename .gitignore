@@ -7,6 +7,10 @@
 !data/short_coms_agg.csv
 !data/short_coms_all.csv
 !data/short_coms_sentiment.csv
+!data
+!box_office
+!data_analysis
+!sentiment
 
 !data_analysis/main.py
 !id_register.py
